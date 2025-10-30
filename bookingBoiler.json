@@ -1,0 +1,15 @@
+ {
+    bookingDetails: {
+        arivalDate: null,
+        departureDate: null,
+        childBedAmount: 0,
+        VIP: false,
+
+    },
+    personalDetails: {
+        firstName: "",
+        lastName: "",
+        phoneNumber: "",
+        emailAdress: ""
+    }
+ }

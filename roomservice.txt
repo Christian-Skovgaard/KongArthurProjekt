@@ -1,0 +1,13 @@
+endpoint: /reserve
+
+bliver kontaktet med request med roomrequestdata.json
+
+behandler roomrequestdata.json => finder plads
+
+gemmer den resaverede plads i DB (skemalægger)
+
+sender den en apporved besked med resavationsdetaljer tilbage til den som spugte.
+
+
+endpoint /getSchema for room 
+

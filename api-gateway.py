@@ -1,7 +1,7 @@
 from flask import Flask, request, jsonify
 import mysql.connector
 
-password_key = "Vgy76yjM#"
+password_key = "your_password_here"
 
 con=mysql.connector.connect(
     host="localhost",
@@ -41,6 +41,7 @@ def get_table_drink_type():
     con.close()
     table_names=[table[0] for table in tables]
     return jsonify({"tables":table_names}),200
+
 
 if __name__ == '__main__':
     print("Connecting to DB...")

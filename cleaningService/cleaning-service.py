@@ -53,12 +53,21 @@ def get_cleaning_task_by_id():
 # Add new cleaning task - venter på Christian
 @app.route('/cleaning/newtask', methods=['POST'])
 def add_cleaning_task():
-    task_data = request.json
-    room_number = task_data.get()
-    cleaning_task_completed[room_number] = {
-        "task_status": False
-    }
-    return jsonify({"message": "Cleaning task added"}), 201
+    task_data = request.json or {}
+    room_number = task_data.get('room_number')
+
+    conn = mysql.connect()
+    cursor = conn.cursor()
+
+    cursor.execute(
+        "INSERT INTO hotel_arthur_cleaning_service (room_id, task_status) VALUES (%s, %s);",
+        (room_number, False)
+    )
+    conn.commit()
+
+    cursor.close()
+    conn.close()
+    return jsonify({"message": "Cleaning task added", "room_number": room_number}), 201
 
 
 # Update cleaning task status

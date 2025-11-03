@@ -8,7 +8,7 @@
 # http://127.0.0.1:5000/guests     (in body, use 'guest.json for format)
 # DELETE:
 # http://127.0.0.1:5000/guests/<id>
-# http://127.0.0.1:5000/guests/by-last-name?last=&first=
+# http://127.0.0.1:5000/guests/by-full-name?last=&first=
 
 
 # SQL table format:
@@ -285,7 +285,7 @@ def delete_guest(guest_id):
 
 
 
-# DELETE guests by first and last name = http://127.0.0.1:5000/guests/by-last-name?last=&first=
+# DELETE guests by first and last name = http://127.0.0.1:5000/guests/by-full-name?last=&first=
 @app.route('/guests/by-full-name', methods=['DELETE'])
 def delete_guest_by_full_name():
     try:

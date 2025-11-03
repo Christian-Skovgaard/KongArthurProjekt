@@ -1,26 +1,91 @@
+# All possible requests for Guestservice:
+# GET:
+# http://127.0.0.1:5000/guestservice-is-running
+# http://127.0.0.1:5000/guests/all
+# http://127.0.0.1:5000/guests/<id>
+# http://127.0.0.1:5000/guests/by-last-name?name=
+# POST:
+# http://127.0.0.1:5000/guests     (in body, use 'guest.json for format)
+# DELETE:
+# http://127.0.0.1:5000/guests/<id>
+# http://127.0.0.1:5000/guests/by-last-name?last=&first=
+
+
+# SQL table format:
+'''
+CREATE TABLE guests (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    first_name VARCHAR(100),
+    last_name VARCHAR(100),
+    bed_amount INT,
+    guest_type VARCHAR(50),
+    allergies JSON,
+    luggage JSON,
+    additional_requests JSON,
+    diet_requests JSON
+);
+'''
+
+
+
+##################################################################
+# DB Connections Establisment
+##################################################################
+
+
+
 from flask import Flask, request, jsonify
 import mysql.connector
 import json
 
+
+
 app = Flask(__name__)
 
+PASSWORD = "Ridder" # Replace with your actual DB password - Default app password: PASSWORD = Ridder
 
-PASSWORD = "INSERT_YOUR_PASSWORD_HERE" # Replace with your actual MySQL root password (maybe we use a variable later on???)
 
-# Checks wether your service is running
+
+# Checks wether your service is running = http://127.0.0.1:5000/guestservice-is-running
 @app.route('/guestservice-is-running', methods=['GET'])
 def is_running():
-    return "API Gateway is running", 200
+    return "Guestservice is running", 200
 
-# DB get all guests
-def get_all_guests_from_db():
-    conn = mysql.connector.connect(
+
+
+# '''
+# Connection establishment to DB Online
+def connection():
+    return mysql.connector.connect(
+        host="kingofthetable.duckdns.org",
+        port=3306,
+        user="app",
+        password=PASSWORD,
+        database="hotel_kong_arthur"
+    )
+'''
+# Connection establishment to DB Local
+def connection():
+    return mysql.connector.connect(
         host="localhost",
         port=3306,
         user="root",
         password=PASSWORD,
         database="hotel_kong_arthur"
     )
+'''
+
+
+
+##################################################################
+# DB connection functions
+##################################################################
+
+
+
+# DB get all guests
+def get_all_guests_from_db():
+    conn = connection()
     cursor = conn.cursor(dictionary=True)
 
     cursor.execute("SELECT * FROM guests")
@@ -33,15 +98,41 @@ def get_all_guests_from_db():
 
 
 
+# DB get a single guest by ID
+def get_guest_by_id_from_db(guest_id):
+    conn = connection()
+    cursor = conn.cursor(dictionary=True)
+
+    query = "SELECT * FROM guests WHERE id = %s"
+    cursor.execute(query, (guest_id,))
+    guest = cursor.fetchone()
+
+    cursor.close()
+    conn.close()
+
+    return guest
+
+
+
+# DB get guests by last name
+def get_guests_by_last_name_from_db(last_name):
+    conn = connection()
+    cursor = conn.cursor(dictionary=True)
+
+    query = "SELECT * FROM guests WHERE last_name = %s"
+    cursor.execute(query, (last_name,))
+    guests = cursor.fetchall()
+
+    cursor.close()
+    conn.close()
+
+    return guests
+
+
+
 # DB post a guest
 def post_guest_to_db(guest):
-    conn = mysql.connector.connect(
-        host="localhost",
-        port=3306,
-        user="root",
-        password=PASSWORD,
-        database="hotel_kong_arthur"
-    )
+    conn = connection()
     cursor = conn.cursor()
 
     query = """
@@ -68,14 +159,10 @@ def post_guest_to_db(guest):
     conn.close()
 
 
+
+# DB delete a guest by ID
 def delete_guest_from_db(guest_id):
-    conn = mysql.connector.connect(
-        host="localhost",
-        port=3306,
-        user="root",
-        password=PASSWORD,
-        database="hotel_kong_arthur"
-    )
+    conn = connection()
     cursor = conn.cursor()
 
     query = "DELETE FROM guests WHERE id = %s"
@@ -86,7 +173,31 @@ def delete_guest_from_db(guest_id):
 
 
 
-@app.route('/guests', methods=['GET'])
+# DB delete guests by first and last name
+def delete_guest_by_full_name_from_db(first_name, last_name):
+    conn = connection()
+    cursor = conn.cursor()
+
+    query = "DELETE FROM guests WHERE first_name = %s AND last_name = %s"
+    cursor.execute(query, (first_name, last_name))
+    affected_rows = cursor.rowcount
+
+    conn.commit()
+    cursor.close()
+    conn.close()
+
+    return affected_rows
+
+
+
+##################################################################
+# Request Handlers
+##################################################################
+
+
+
+# GET all guests = http://127.0.0.1:5000/guests
+@app.route('/guests/all', methods=['GET'])
 def get_guests():
     try:
         guests = get_all_guests_from_db()
@@ -98,6 +209,43 @@ def get_guests():
 
 
 
+# GET a single guest by ID = http://127.0.0.1:5000/guests/<id>
+@app.route('/guests/<int:guest_id>', methods=['GET'])
+def get_guest_by_id(guest_id):
+    try:
+        guest = get_guest_by_id_from_db(guest_id)
+        if guest:
+            return jsonify(guest), 200
+        else:
+            return jsonify({"error": "Guest not found"}), 404
+    except Exception as e:
+        return jsonify({"error": "Failed to load guest", "details": str(e)}), 500
+    finally:
+        print(f"GET /guests/{guest_id} request processed.")
+
+
+
+# GET guests by last name = http://127.0.0.1:5000/guests/by-last-name?name=
+@app.route('/guests/by-last-name', methods=['GET'])
+def get_guests_by_last_name():
+    try:
+        last_name = request.args.get('name')
+        if not last_name:
+            return jsonify({"error": "Missing 'name' query parameter"}), 400
+
+        guests = get_guests_by_last_name_from_db(last_name)
+        if guests:
+            return jsonify(guests), 200
+        else:
+            return jsonify({"message": f"No guests found with last name '{last_name}'"}), 404
+    except Exception as e:
+        return jsonify({"error": "Failed to load guests", "details": str(e)}), 500
+    finally:
+        print(f"GET /guests/by-last-name?name={last_name} request processed.")
+
+
+
+# POST a guest = http://127.0.0.1:5000/guests     (in body, use 'guest.json for format)
 @app.route('/guests', methods=['POST'])
 def add_guest():
     try:
@@ -124,7 +272,7 @@ def add_guest():
 
 
 
-
+# DELETE a guest = http://127.0.0.1:5000/guests/<id>
 @app.route('/guests/<int:guest_id>', methods=['DELETE'])
 def delete_guest(guest_id):
     try:
@@ -135,6 +283,27 @@ def delete_guest(guest_id):
     finally:
         print(f"DELETE /guests/{guest_id} request processed.")
 
+
+
+# DELETE guests by first and last name = http://127.0.0.1:5000/guests/by-last-name?last=&first=
+@app.route('/guests/by-full-name', methods=['DELETE'])
+def delete_guest_by_full_name():
+    try:
+        last_name = request.args.get('last')
+        first_name = request.args.get('first')
+
+        if not first_name or not last_name:
+            return jsonify({"error": "Missing 'first' or 'last' query parameter"}), 400
+
+        deleted_count = delete_guest_by_full_name_from_db(first_name, last_name)
+        if deleted_count > 0:
+            return jsonify({"message": f"{deleted_count} guest(s) named {first_name} {last_name} deleted"}), 200
+        else:
+            return jsonify({"message": f"No guests found with name {first_name} {last_name}"}), 404
+    except Exception as e:
+        return jsonify({"error": "Failed to delete guest", "details": str(e)}), 500
+    finally:
+        print(f"DELETE /guests/by-full-name?last={last_name}&first={first_name} request processed.")
 
 
 

@@ -1,3 +1,38 @@
+/* Single instance of json example */
+  {
+    "First Name": "Jens",
+    "Last Name": "Poulsen",
+    "Allergies": [
+      {
+        "amount": 0,
+        "type": "None"
+      }
+    ],
+    "Bed Amount": 1,
+    "Type": "Boomer",
+    "Luggage": [
+      {
+        "amount": 1,
+        "item": "Backpack"
+      }
+    ],
+    "Additional Request": [
+      {
+        "amount": 0,
+        "request": "None"
+      }
+    ],
+    "Diet Request": [
+      {
+        "amount": 0,
+        "type": "None"
+      }
+    ]
+  }
+
+
+
+/* Multi instance of json example */
 [
   {
     "First Name": "Jens",

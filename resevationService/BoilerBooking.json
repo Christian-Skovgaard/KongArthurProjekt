@@ -1,0 +1,17 @@
+{
+    "arrivalDate": "",
+    "departureDate": "",
+    "arivalTime": "",
+    "departuretime": "",
+    "peopleAmount": 0,
+    "roomType": "",
+    "fName": "",
+    "lName": "",
+    "allergies": [],
+    "Luggage": [{
+        "type": "",
+        "amount": ""
+    }],
+    "additionalRequest": "",
+    "isVIP": false
+}

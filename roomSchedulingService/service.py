@@ -16,16 +16,6 @@ app.config['MYSQL_DB'] = os.getenv("DB_NAME")
 mysql.init_app(app)
 
 
-@app.route('/rooms', methods=['GET'])
-def get_rooms():
-    cursor = mysql.connection.cursor()
-    cursor.execute("SELECT * FROM roomMeta")
-    rows = cursor.fetchall()
-    cursor.close()
-    return jsonify([
-        {'roomNr': row[0], 'type': row[1], 'capacity': row[2]} for row in rows
-    ])
-
 @app.route('/requestBooking', methods=['post'])
 def requestBooking():
     requestJson = request.get_json()
@@ -100,18 +90,10 @@ def requestBooking():
 
 @app.route('/test', methods=['GET'])
 def test():
-    cursor = mysql.connection.cursor()
-    cursor.execute("SELECT * FROM roomMeta WHERE roomNr = 1")
-    rows = cursor.fetchall()
-    print(rows)
-    cursor.execute("SELECT * FROM roomMeta WHERE roomNr = 4")
-    rows = cursor.fetchall()
-    print(rows)
-    cursor.close()
     return "hello there"
 
     
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, port=5002)

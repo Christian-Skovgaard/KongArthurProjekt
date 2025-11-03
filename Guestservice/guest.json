@@ -1,0 +1,66 @@
+[
+  {
+    "First Name": "Jens",
+    "Last Name": "Poulsen",
+    "Allergies": [
+      {
+        "amount": 0,
+        "type": "None"
+      }
+    ],
+    "Bed Amount": 1,
+    "Type": "Boomer",
+    "Luggage": [
+      {
+        "amount": 1,
+        "item": "Backpack"
+      }
+    ],
+    "Additional Request": [
+      {
+        "amount": 0,
+        "request": "None"
+      }
+    ],
+    "Diet Request": [
+      {
+        "amount": 0,
+        "type": "None"
+      }
+    ]
+  },
+  {
+    "First Name": "Andreas",
+    "Last Name": "Gudmann",
+    "Allergies": [
+      {
+        "amount": 0,
+        "type": "None"
+      }
+    ],
+    "Bed Amount": 2,
+    "Type": "VIP",
+    "Luggage": [
+      {
+        "amount": 2,
+        "item": "Suitcase"
+      },
+      {
+        "amount": 1,
+        "item": "Backpack"
+      }
+    ],
+    "Additional Request": [
+      {
+        "amount": 1,
+        "request": "Luxery Yacht"
+      }
+    ],
+    "Diet Request": [
+      {
+        "amount": 1,
+        "type": "BEEF"
+      }
+    ]
+  }
+]

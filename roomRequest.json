@@ -1,8 +1,0 @@
-{
-    startDate: "",
-    endDate: "",
-    startTime: "",
-    endTime: "",
-    minBedAmount: 0,   //uden for scope at lave dobbelt/enkelt
-    targetCategory: "" 
-}

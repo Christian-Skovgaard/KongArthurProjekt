@@ -18,17 +18,12 @@ docker build -t $ROOM_IMAGE ./roomSchedulingService
 echo "Creating Docker network: $NETWORK_NAME"
 docker network create $NETWORK_NAME
 
-echo "Running $RESEVATION_NAME container..."
+echo "Running containers"
 # docker run -d --name $RESEVATION_NAME --network $NETWORK_NAME -p $RESEVATION_PORT:5000 $RESEVATION_IMAGE
 docker run -d --name $RESEVATION_NAME --network $NETWORK_NAME -p $RESEVATION_PORT:5000 $RESEVATION_IMAGE
-
-echo "Running $ROOM_NAME container..."
 docker run -d --name $ROOM_NAME --network $NETWORK_NAME -p $ROOM_PORT:5000 $ROOM_IMAGE
 
-echo "Containers in network $NETWORK_NAME:"
+echo "Containers in $NETWORK_NAME:"
 docker ps --filter "network=$NETWORK_NAME"
 
-
-# echo "Testing connectivity from $RESEVATION_NAME to $ROOM_NAME..."
-# docker exec -it $RESEVATION_NAME curl -s http://$ROOM_NAME:5000/test
 

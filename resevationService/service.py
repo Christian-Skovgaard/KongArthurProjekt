@@ -25,10 +25,11 @@ def postBooking():
             "roomType": bookingJson.get("roomType")
         }
 
-        tempUrl = "http://localhost:5002/requestBooking" # skal ændres når container
+        tempUrl = "http://room_scheduling_service:5000/requestBooking" # skal ændres når container
         requestHeader = {'Content-Type': 'application/json'}
 
         response = requests.post(tempUrl, headers=requestHeader, json=requestBody)
+        print(response)
         responseObj = response.json()
 
         if (not responseObj.get("approved")):
@@ -81,4 +82,4 @@ def test():
     
 
 if __name__ == '__main__':
-    app.run(debug=True, port=5000, host="0.0.0.0")
+    app.run(debug=True, port=5000, host="0.0.0.0") # exposed port = 5001

@@ -13,6 +13,7 @@ app.config['MYSQL_HOST'] = os.getenv("DB_HOST")
 app.config['MYSQL_USER'] = os.getenv("DB_USER")
 app.config['MYSQL_PASSWORD'] = os.getenv("DB_PASSWORD")
 app.config['MYSQL_DB'] = os.getenv("DB_NAME")
+app.config['MYSQL_PORT'] = int(os.getenv("DB_PORT"))
 mysql.init_app(app)
 
 
@@ -59,13 +60,15 @@ def requestBooking():
         bookedCapacity = 0
         i = 0
 
+        # Her tager vi fat i de første og ikke dem som giver mest mening, det betyder at hvis der er 5 gæster og i samme kategori er der rum med 2 capasitet, men dem med 1 kapasitet har lavest roomNR for de dem, så 5 rum med 1 seng
+
         while(bookedCapacity < requestJson["peopleAmount"]):
             roomMap = {
                 "roomNr": availableRooms[i][0],
                 "capacity": availableRooms[i][2],
             }
             bookedRooms.append(roomMap)
-            bookedCapacity += availableRooms[i][1]
+            bookedCapacity += availableRooms[i][2]
             i += 1
 
         # add bookings to db
@@ -87,11 +90,14 @@ def requestBooking():
 
     return jsonify(responseJson)
 
+@app.route('/testPost', methods=['post'])
+def testPost():
+    return "this also works!"
 
 @app.route('/test', methods=['GET'])
 def test():
-    return "this works!!!!"
+    return "this works!!!!🦞🦞🥷🏿🦤🫎🏕️"
 
 
 if __name__ == '__main__':
-    app.run(debug=True, port=5000, host='0.0.0.0')
+    app.run(debug=True, port=5000, host='0.0.0.0') # exposed port = 5002

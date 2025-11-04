@@ -1,16 +1,6 @@
 from flask import Flask, jsonify, request
-import mysql.connector
 from datetime import datetime
-
-
-# Database connection
-db = mysql.connector.connect(
-    host="localhost",
-    user="root",
-    password="kode", 
-    database="123"
-)
-cursor = db.cursor(dictionary=True)
+from db_utils import get_connection
 
 app = Flask(__name__)
 
@@ -34,10 +24,14 @@ def create_order():
     table_number = data.get("table_number")
     order_time = data.get("order_time")
 
+    conn = get_connection()
+    cursor = conn.cursor()
     query = "INSERT INTO orders (meal_id, table_number, order_time) VALUES (%s, %s, %s)"
     values = (meal_id, table_number, order_time)
     cursor.execute(query, values)
-    db.commit()
+    conn.commit()
+    cursor.close()
+    conn.close()
 
     return jsonify({
         "message": "Order created successfully",
@@ -54,10 +48,14 @@ def create_booking():
     time = data.get("time")
     created_at = data.get("created_at")
 
+    conn = get_connection()
+    cursor = conn.cursor()
     query = "INSERT INTO bookings (name, time, created_at) VALUES (%s, %s, %s)"
     values = (name, time, created_at)
     cursor.execute(query, values)
-    db.commit()
+    conn.commit()
+    cursor.close()
+    conn.close()
 
     return jsonify({
         "message": "Booking created successfully",
@@ -75,10 +73,14 @@ def roomservice():
     price = data.get("price")
     time = data.get("time")
 
+    conn = get_connection()
+    cursor = conn.cursor()
     query = "INSERT INTO roomservice (meal_id, price, time) VALUES (%s, %s, %s)"
     values = (meal_id, price, time)
     cursor.execute(query, values)
-    db.commit()
+    conn.commit()
+    cursor.close()
+    conn.close()
 
     return jsonify({
         "message": "Roomservice order created successfully",

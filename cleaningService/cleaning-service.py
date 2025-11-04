@@ -1,25 +1,15 @@
 from flask import Flask, jsonify, request
-from flaskext.mysql import MySQL
-from dotenv import load_dotenv
-import os
+from db_utils import get_connection
 
-load_dotenv()
+
 
 app = Flask(__name__)
-
-#Database connection
-mysql = MySQL()
-app.config['MYSQL_DATABASE_HOST'] = os.getenv('DB_HOST')
-app.config['MYSQL_DATABASE_USER'] = os.getenv('DB_USER')
-app.config['MYSQL_DATABASE_PASSWORD'] = os.getenv('DB_PASSWORD')
-app.config['MYSQL_DATABASE_DB'] = os.getenv('DB_NAME')
-mysql.init_app(app)
 
 
 # Get all cleaning tasks
 @app.route('/cleaning/tasks', methods=['GET'])
 def get_cleaning_tasks():
-    conn = mysql.connect()
+    conn = get_connection()
     cursor = conn.cursor()
 
     cursor.execute("SELECT * FROM hotel_arthur_cleaning_service;")
@@ -35,7 +25,7 @@ def get_cleaning_tasks():
 #Get cleaning task by room id
 @app.route('/cleaning/room_number', methods=['GET'])
 def get_cleaning_task_by_id():
-    conn = mysql.connect()
+    conn = get_connection()
     cursor = conn.cursor()
 
     room_number = request.args.get('room_number')
@@ -56,7 +46,7 @@ def add_cleaning_task():
     task_data = request.json or {}
     room_number = task_data.get('room_number')
 
-    conn = mysql.connect()
+    conn = get_connection()
     cursor = conn.cursor()
 
     cursor.execute(
@@ -73,7 +63,7 @@ def add_cleaning_task():
 # Update cleaning task status
 @app.route('/cleaning/<room_number>/changestatus', methods=['PUT'])
 def update_cleaning_task_status(room_number):
-    conn = mysql.connect()
+    conn = get_connection()
     cursor = conn.cursor()
     
     # Get current status
@@ -102,7 +92,7 @@ def update_cleaning_task_status(room_number):
 @app.route('/cleaning/checkout/<room_number>', methods=['DELETE'])
 def remove_room_from_cleaning_tasks(room_number):
 
-    conn = mysql.connect()
+    conn = get_connection()
     cursor = conn.cursor()
 
     cursor.execute("DELETE FROM hotel_arthur_cleaning_service WHERE room_id = %s;", (room_number,))

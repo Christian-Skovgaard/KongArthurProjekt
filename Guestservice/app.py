@@ -37,12 +37,13 @@ CREATE TABLE guests (
 from flask import Flask, request, jsonify
 import mysql.connector
 import json
+import os
 
 
 
 app = Flask(__name__)
 
-PASSWORD = "Ridder" # Replace with your actual DB password - Default app password: PASSWORD = Ridder
+PASSWORD = os.getenv('DB_PASSWORD', 'Ridder')
 
 
 
@@ -55,25 +56,12 @@ def is_running():
 
 # '''
 # Connection establishment to DB Online
+from db_utils import get_connection
+
+
 def connection():
-    return mysql.connector.connect(
-        host="kongarthurhotel-kongarthurhotel.e.aivencloud.com",
-        port=26378,
-        user="app",
-        password=PASSWORD,
-        database="hotel_kong_arthur"
-    )
-'''
-# Connection establishment to DB Local
-def connection():
-    return mysql.connector.connect(
-        host="localhost",
-        port=3306,
-        user="root",
-        password=PASSWORD,
-        database="hotel_kong_arthur"
-    )
-'''
+    # wrapper - return a new connection from db_utils
+    return get_connection()
 
 
 

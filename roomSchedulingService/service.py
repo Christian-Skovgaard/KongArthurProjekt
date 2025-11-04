@@ -1,20 +1,12 @@
 from flask import Flask, jsonify, request
-from flask_mysqldb import MySQL
 from dotenv import load_dotenv
 import os
 from datetime import datetime, date, time, timedelta
+from db_utils import get_connection
 
 load_dotenv() # Load env
 
 app = Flask(__name__)
-
-mysql = MySQL()
-app.config['MYSQL_HOST'] = os.getenv("DB_HOST")
-app.config['MYSQL_USER'] = os.getenv("DB_USER")
-app.config['MYSQL_PASSWORD'] = os.getenv("DB_PASSWORD")
-app.config['MYSQL_DB'] = os.getenv("DB_NAME")
-app.config['MYSQL_PORT'] = int(os.getenv("DB_PORT"))
-mysql.init_app(app)
 
 
 @app.route('/requestBooking', methods=['post'])
@@ -30,7 +22,8 @@ def requestBooking():
         requestJson["endTime"] = defaultTimes[1]
     
     # make db conn
-    cursor = mysql.connection.cursor()
+    conn = get_connection()
+    cursor = conn.cursor()
 
     # make query
     query = f"""
@@ -76,17 +69,17 @@ def requestBooking():
             insertQuery = f"insert into roomBooking (roomNr, startTime, endTime) VALUES ({booking['roomNr']}, '{requestJson['startDate']} {requestJson['startTime']}', '{requestJson['endDate']} {requestJson['endTime']}');"
             cursor.execute(insertQuery)
             print(insertQuery)
-        
-        mysql.connection.commit()
+
+        conn.commit()
 
         responseJson["rooms"] = bookedRooms
         responseJson["roomAmount"] = len(bookedRooms)
-        
+
     else:
         responseJson["approved"] = False
-        
 
     cursor.close()
+    conn.close()
 
     return jsonify(responseJson)
 

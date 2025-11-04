@@ -1,39 +1,17 @@
 version: '3.8'
 
 services:
-  db:
-    image: mysql:8.0
-    container_name: kongarthur_mysql
-    restart: unless-stopped
-    environment:
-      MYSQL_ROOT_PASSWORD: rootpassword
-      MYSQL_DATABASE: hotel_arthur
-      MYSQL_USER: arthuro
-      MYSQL_PASSWORD: arthuro_pass
-    volumes:
-      - db_data:/var/lib/mysql
-    ports:
-      - "3307:3306"
-    healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
   cleaningservice:
     build:
       context: ./cleaningService
     image: cleaningservice:local
     container_name: cleaning_service
     restart: unless-stopped
-    depends_on:
-      db:
-        condition: service_healthy
     environment:
-      DB_HOST: db
-      DB_USER: arthuro
-      DB_PASSWORD: arthuro_pass
-      DB_NAME: hotel_arthur
+      DB_HOST: ${DB_HOST}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_NAME: ${DB_NAME}
     ports:
       - "5000:5000"
     networks:
@@ -45,14 +23,11 @@ services:
     image: restaurantservice:local
     container_name: restaurant_service
     restart: unless-stopped
-    depends_on:
-      db:
-        condition: service_healthy
     environment:
-      DB_HOST: db
-      DB_USER: arthuro
-      DB_PASSWORD: arthuro_pass
-      DB_NAME: hotel_arthur
+      DB_HOST: ${DB_HOST}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_NAME: ${DB_NAME}
     ports:
       - "5001:5000" # map host 5001 -> container 5000
     networks:
@@ -65,14 +40,11 @@ services:
     image: guestservice:local
     container_name: guest_service
     restart: unless-stopped
-    depends_on:
-      db:
-        condition: service_healthy
     environment:
-      DB_HOST: db
-      DB_USER: arthuro
-      DB_PASSWORD: arthuro_pass
-      DB_NAME: hotel_arthur
+      DB_HOST: ${DB_HOST}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_NAME: ${DB_NAME}
     ports:
       - "5002:5000"
     networks:
@@ -85,14 +57,11 @@ services:
     image: reservationservice:local
     container_name: reservation_service
     restart: unless-stopped
-    depends_on:
-      db:
-        condition: service_healthy
     environment:
-      DB_HOST: db
-      DB_USER: arthuro
-      DB_PASSWORD: arthuro_pass
-      DB_NAME: hotel_arthur
+      DB_HOST: ${DB_HOST}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_NAME: ${DB_NAME}
     ports:
       - "5003:5000"
     networks:
@@ -105,21 +74,15 @@ services:
     image: roomschedulingservice:local
     container_name: roomscheduling_service
     restart: unless-stopped
-    depends_on:
-      db:
-        condition: service_healthy
     environment:
-      DB_HOST: db
-      DB_USER: arthuro
-      DB_PASSWORD: arthuro_pass
-      DB_NAME: hotel_arthur
+      DB_HOST: ${DB_HOST}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_NAME: ${DB_NAME}
     ports:
       - "5004:5000"
     networks:
       - appnet
-
-volumes:
-  db_data:
 
 networks:
   appnet:

@@ -75,9 +75,9 @@ def postBooking():
 
 @app.route('/', methods=['GET'])
 def test():
-    url = "http://localhost:5002/test?"
+    url = "http://room_scheduling_service:5000/test?"
     result = requests.get(url)
-    return result
+    return result.text
     
 
 if __name__ == '__main__':

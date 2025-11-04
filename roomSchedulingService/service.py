@@ -13,18 +13,9 @@ app.config['MYSQL_HOST'] = os.getenv("DB_HOST")
 app.config['MYSQL_USER'] = os.getenv("DB_USER")
 app.config['MYSQL_PASSWORD'] = os.getenv("DB_PASSWORD")
 app.config['MYSQL_DB'] = os.getenv("DB_NAME")
+app.config['MYSQL_PORT'] = int(os.getenv("DB_PORT"))
 mysql.init_app(app)
 
-
-@app.route('/rooms', methods=['GET'])
-def get_rooms():
-    cursor = mysql.connection.cursor()
-    cursor.execute("SELECT * FROM roomMeta")
-    rows = cursor.fetchall()
-    cursor.close()
-    return jsonify([
-        {'roomNr': row[0], 'type': row[1], 'capacity': row[2]} for row in rows
-    ])
 
 @app.route('/requestBooking', methods=['post'])
 def requestBooking():
@@ -50,8 +41,8 @@ def requestBooking():
         SELECT 1
         FROM roomBooking
         WHERE roomBooking.roomNr = roomMeta.roomNr
-        AND '{requestJson['endDate']} {requestJson['endTime']}' > roomBooking.startTime
-        AND '{requestJson['startDate']} {requestJson['startTime']}' < roomBooking.endTime
+        AND '{requestJson["endDate"]} {requestJson["endTime"]}' > roomBooking.startTime
+        AND '{requestJson["startDate"]} {requestJson["startTime"]}' < roomBooking.endTime
     );
     """ 
     
@@ -69,18 +60,20 @@ def requestBooking():
         bookedCapacity = 0
         i = 0
 
+        # Her tager vi fat i de første og ikke dem som giver mest mening, det betyder at hvis der er 5 gæster og i samme kategori er der rum med 2 capasitet, men dem med 1 kapasitet har lavest roomNR for de dem, så 5 rum med 1 seng
+
         while(bookedCapacity < requestJson["peopleAmount"]):
             roomMap = {
                 "roomNr": availableRooms[i][0],
                 "capacity": availableRooms[i][2],
             }
             bookedRooms.append(roomMap)
-            bookedCapacity += availableRooms[i][1]
+            bookedCapacity += availableRooms[i][2]
             i += 1
 
         # add bookings to db
         for booking in bookedRooms:
-            insertQuery = f"insert into roomBooking (roomNr, startTime, endTime) VALUES ({booking["roomNr"]}, '{requestJson['startDate']} {requestJson['startTime']}', '{requestJson['endDate']} {requestJson['endTime']}');"
+            insertQuery = f"insert into roomBooking (roomNr, startTime, endTime) VALUES ({booking['roomNr']}, '{requestJson['startDate']} {requestJson['startTime']}', '{requestJson['endDate']} {requestJson['endTime']}');"
             cursor.execute(insertQuery)
             print(insertQuery)
         
@@ -97,21 +90,14 @@ def requestBooking():
 
     return jsonify(responseJson)
 
+@app.route('/testPost', methods=['post'])
+def testPost():
+    return "this also works!"
 
 @app.route('/test', methods=['GET'])
 def test():
-    cursor = mysql.connection.cursor()
-    cursor.execute("SELECT * FROM roomMeta WHERE roomNr = 1")
-    rows = cursor.fetchall()
-    print(rows)
-    cursor.execute("SELECT * FROM roomMeta WHERE roomNr = 4")
-    rows = cursor.fetchall()
-    print(rows)
-    cursor.close()
-    return "hello there"
-
-    
+    return "this works!!!!🦞🦞🥷🏿🦤🫎🏕️"
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, port=5000, host='0.0.0.0') # exposed port = 5002

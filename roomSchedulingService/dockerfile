@@ -2,9 +2,29 @@ FROM python:3.9.25-slim-trixie
 
 WORKDIR /service
 
-COPY roomSchedulingService service
+COPY . .
 
-RUN pip install -r requirements.txt
+# requirements for vores workaround med PyMySQL som man sikkert kunne have fået fra et andet base image
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+    pkg-config \
+    default-libmysqlclient-dev \
+    build-essential && \
+    rm -rf /var/lib/apt/lists/*
+
+# Vi har i vores kode brugt MySQLdb, men det er skrevet i C og skal derfor bruge en compiler, og det gør imaged større
+# Vi erstatter derfor MySQLdb med PyMySQL, so gør det samme men er skrevet i python, så det køre på vores docker base image
+# Det gør vi helt konkret i .install_as
+# pga forskellig OS skal vi også bruge et path-lib
+RUN pip install --no-cache-dir PyMySQL==1.0.3 && \
+    python - <<'PY'
+import pathlib
+pathlib.Path('sitecustomize.py').write_text(
+    "import pymysql\npymysql.install_as_MySQLdb()\n"
+)
+PY
+
+RUN pip install --no-cache-dir -r requirements.txt
 
 EXPOSE 5000
 

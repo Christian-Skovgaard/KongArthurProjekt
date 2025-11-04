@@ -40,8 +40,8 @@ def requestBooking():
         SELECT 1
         FROM roomBooking
         WHERE roomBooking.roomNr = roomMeta.roomNr
-        AND '{requestJson['endDate']} {requestJson['endTime']}' > roomBooking.startTime
-        AND '{requestJson['startDate']} {requestJson['startTime']}' < roomBooking.endTime
+        AND '{requestJson["endDate"]} {requestJson["endTime"]}' > roomBooking.startTime
+        AND '{requestJson["startDate"]} {requestJson["startTime"]}' < roomBooking.endTime
     );
     """ 
     
@@ -70,7 +70,7 @@ def requestBooking():
 
         # add bookings to db
         for booking in bookedRooms:
-            insertQuery = f"insert into roomBooking (roomNr, startTime, endTime) VALUES ({booking["roomNr"]}, '{requestJson['startDate']} {requestJson['startTime']}', '{requestJson['endDate']} {requestJson['endTime']}');"
+            insertQuery = f"insert into roomBooking (roomNr, startTime, endTime) VALUES ({booking['roomNr']}, '{requestJson['startDate']} {requestJson['startTime']}', '{requestJson['endDate']} {requestJson['endTime']}');"
             cursor.execute(insertQuery)
             print(insertQuery)
         
@@ -92,8 +92,6 @@ def requestBooking():
 def test():
     return "hello there"
 
-    
-
 
 if __name__ == '__main__':
-    app.run(debug=True, port=5002)
+    app.run(debug=True, port=5000, host='0.0.0.0')

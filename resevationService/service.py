@@ -73,7 +73,12 @@ def postBooking():
     scheduleCleaning()
     return bookingJson
 
+@app.route('/', methods=['GET'])
+def test():
+    url = "http://localhost:5002/test?"
+    result = requests.get(url)
+    return result
     
 
 if __name__ == '__main__':
-    app.run(debug=True, port=5001)
+    app.run(debug=True, port=5000, host="0.0.0.0")

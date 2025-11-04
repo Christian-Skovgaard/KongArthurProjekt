@@ -90,7 +90,7 @@ def requestBooking():
 
 @app.route('/test', methods=['GET'])
 def test():
-    return "hello there"
+    return "very sexy!"
 
 
 if __name__ == '__main__':

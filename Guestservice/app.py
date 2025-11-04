@@ -57,8 +57,8 @@ def is_running():
 # Connection establishment to DB Online
 def connection():
     return mysql.connector.connect(
-        host="kingofthetable.duckdns.org",
-        port=3306,
+        host="kongarthurhotel-kongarthurhotel.e.aivencloud.com",
+        port=26378,
         user="app",
         password=PASSWORD,
         database="hotel_kong_arthur"

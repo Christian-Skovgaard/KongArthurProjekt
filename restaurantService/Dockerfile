@@ -1,26 +1,27 @@
 FROM python:3.11-slim
 
-# Prevent .pyc files and make logs appear immediately
+# Prevent Python from writing pyc files and buffering stdout/stderr
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 
 WORKDIR /app
 
-# Install system deps if any (kept minimal)
+# Install system dependencies needed for MySQL client
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
        build-essential \
+       default-libmysqlclient-dev \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy and install Python dependencies
+# Copy requirements first for better cache utilization
 COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy app source
+# Copy application code
 COPY . /app
 
-# Expose common Flask port (if your app uses a different port, change this)
+# Expose the Flask port
 EXPOSE 5000
 
-# Run the restaurant service
+# Run the service
 CMD ["python", "restaurant_service.py"]

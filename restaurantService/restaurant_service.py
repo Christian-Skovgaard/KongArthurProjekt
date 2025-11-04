@@ -2,6 +2,7 @@ from flask import Flask, jsonify, request
 import mysql.connector
 from datetime import datetime
 
+
 # Database connection
 db = mysql.connector.connect(
     host="localhost",

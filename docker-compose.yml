@@ -1,0 +1,126 @@
+version: '3.8'
+
+services:
+  db:
+    image: mysql:8.0
+    container_name: kongarthur_mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: hotel_arthur
+      MYSQL_USER: arthuro
+      MYSQL_PASSWORD: arthuro_pass
+    volumes:
+      - db_data:/var/lib/mysql
+    ports:
+      - "3307:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  cleaningservice:
+    build:
+      context: ./cleaningService
+    image: cleaningservice:local
+    container_name: cleaning_service
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DB_HOST: db
+      DB_USER: arthuro
+      DB_PASSWORD: arthuro_pass
+      DB_NAME: hotel_arthur
+    ports:
+      - "5000:5000"
+    networks:
+      - appnet
+
+  restaurantservice:
+    build:
+      context: ./restaurantService
+    image: restaurantservice:local
+    container_name: restaurant_service
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DB_HOST: db
+      DB_USER: arthuro
+      DB_PASSWORD: arthuro_pass
+      DB_NAME: hotel_arthur
+    ports:
+      - "5001:5000" # map host 5001 -> container 5000
+    networks:
+      - appnet
+
+  guestservice:
+    build:
+      context: ./Guestservice
+      dockerfile: DockerFile
+    image: guestservice:local
+    container_name: guest_service
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DB_HOST: db
+      DB_USER: arthuro
+      DB_PASSWORD: arthuro_pass
+      DB_NAME: hotel_arthur
+    ports:
+      - "5002:5000"
+    networks:
+      - appnet
+
+  reservationservice:
+    build:
+      context: ./resevationService
+      dockerfile: dockerfile
+    image: reservationservice:local
+    container_name: reservation_service
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DB_HOST: db
+      DB_USER: arthuro
+      DB_PASSWORD: arthuro_pass
+      DB_NAME: hotel_arthur
+    ports:
+      - "5003:5000"
+    networks:
+      - appnet
+
+  roomschedulingservice:
+    build:
+      context: ./roomSchedulingService
+      dockerfile: dockerfile
+    image: roomschedulingservice:local
+    container_name: roomscheduling_service
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DB_HOST: db
+      DB_USER: arthuro
+      DB_PASSWORD: arthuro_pass
+      DB_NAME: hotel_arthur
+    ports:
+      - "5004:5000"
+    networks:
+      - appnet
+
+volumes:
+  db_data:
+
+networks:
+  appnet:
+    driver: bridge

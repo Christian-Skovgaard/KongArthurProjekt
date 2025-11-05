@@ -13,5 +13,5 @@
         "amount": ""
     }],
     "additionalRequest": "",
-    "isVIP": false
+    "guestType": "VIP"
 }

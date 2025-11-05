@@ -19,7 +19,6 @@ echo "Creating Docker network: $NETWORK_NAME"
 docker network create $NETWORK_NAME
 
 echo "Running containers"
-# docker run -d --name $RESEVATION_NAME --network $NETWORK_NAME -p $RESEVATION_PORT:5000 $RESEVATION_IMAGE
 docker run -d --name $RESEVATION_NAME --network $NETWORK_NAME -p $RESEVATION_PORT:5000 $RESEVATION_IMAGE
 docker run -d --name $ROOM_NAME --network $NETWORK_NAME -p $ROOM_PORT:5000 $ROOM_IMAGE
 

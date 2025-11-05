@@ -25,7 +25,7 @@ def postBooking():
             "roomType": bookingJson.get("roomType")
         }
 
-        tempUrl = "http://room_scheduling_service:5000/requestBooking" # skal ændres når container
+        tempUrl = "http://roomschedulingservice:5000/requestBooking" # skal ændres når container
         requestHeader = {'Content-Type': 'application/json'}
 
         response = requests.post(tempUrl, headers=requestHeader, json=requestBody)
@@ -41,7 +41,20 @@ def postBooking():
             print("succesfully booked room")
 
     def scheduleCleaning():
-        None
+        i = 0
+        while(i < len(bookingJson.get("rooms"))):
+            requestObj = {
+                "room_number": bookingJson.get("rooms")[i],
+                "startDate": bookingJson.get("arrivalDate"),
+                "endDate": bookingJson.get("departureDate")
+            }
+
+        url = "http://cleaningservice:5000/cleaning/newtask"
+        header = {'Content-Type': 'application/json'}
+
+        response = requests.post(url=url, headers=header, json=requestObj)
+        if (response != 201):
+            print("error in requesting cleaning: ", response)
 
     def informGuestService():
         requestBody = {
@@ -49,18 +62,19 @@ def postBooking():
             "Last Name": bookingJson.get("lName"), 
             "Allergies": bookingJson.get("allergies"), 
             # "Bed Amount": bookingJson.get(""), -- not your buisness
-            # "Type": bookingJson.get(""), -- not your buisness
+            "Type": bookingJson.get("guestType"),
             "Luggage": bookingJson.get("Luggage"), 
             "Additional Request": bookingJson.get("additionalRequest"), 
             # "Diet Request": bookingJson.get("") -- idkbro
-            "isVIP": bookingJson.get("isVIP")
         }
 
         requestHeader = {'Content-Type': 'application/json'}
-        tempUrl = "http://localhost:5000/guests" # skal ændres når container
+        tempUrl = "http://guestservice:5000/guests" # skal ændres når container
 
         response = requests.post(tempUrl, headers=requestHeader, json=requestBody)
         responseObj = response.json()
+
+        # Vil gerne have et guestID med tilbage!!!
 
         if(response != 201):
             returnJson["approved"] = False
@@ -76,7 +90,7 @@ def postBooking():
 
 @app.route('/', methods=['GET'])
 def test():
-    url = "http://room_scheduling_service:5000/test?"
+    url = "http://roomschedulingservice:5000/test"
     result = requests.get(url)
     return result.text
     

@@ -8,7 +8,6 @@ load_dotenv() # Load env
 
 app = Flask(__name__)
 
-
 @app.route('/requestBooking', methods=['post'])
 def requestBooking():
     requestJson = request.get_json()
@@ -79,9 +78,27 @@ def requestBooking():
         responseJson["approved"] = False
 
     cursor.close()
-    conn.close()
 
     return jsonify(responseJson)
+
+@app.route('/roomSchedules', methods=['get'])
+def getSchedules ():
+    returnList = []
+
+    # query
+    query = "select * from roomBooking"
+
+    if (request.args.get('id') != None):
+        query += f"where id = {request.args.get('id')}"
+
+    cursor = get_connection().cursor()
+
+    cursor.execute(query)
+    returnlist = cursor.fetchall()
+    print(returnlist)
+
+    return returnlist
+
 
 @app.route('/testPost', methods=['post'])
 def testPost():

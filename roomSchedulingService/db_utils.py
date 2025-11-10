@@ -21,7 +21,7 @@ def get_connection(retries=3, delay=1):
     port = int(os.getenv('DB_PORT'))
     last_exc = None
 
-    print(host,user.password,database)
+    print(host,user,password,database)
 
     for _ in range(retries):
         try:

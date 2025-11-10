@@ -25,10 +25,11 @@ def postBooking():
             "roomType": bookingJson.get("roomType")
         }
 
-        tempUrl = "http://roomschedulingservice:5000/requestBooking" # skal ændres når container
+        url = "http://roomschedulingservice:5000/requestBooking"
+        tempUrl = "http://localhost:5000/requestBooking" # skal ændres når container
         requestHeader = {'Content-Type': 'application/json'}
 
-        response = requests.post(tempUrl, headers=requestHeader, json=requestBody)
+        response = requests.post(url, headers=requestHeader, json=requestBody)
         print(response)
         responseObj = response.json()
 
@@ -83,13 +84,15 @@ def postBooking():
         else:
             print("succesfully created guest")
 
-
+    print("booking")
     bookRoom()
-    scheduleCleaning()
-    return bookingJson
+    print("booking done")
+    # scheduleCleaning()
+    return returnJson
 
 @app.route('/', methods=['GET'])
 def test():
+    print("testen🥷🏿")
     url = "http://roomschedulingservice:5000/test"
     result = requests.get(url)
     return result.text
